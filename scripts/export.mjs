@@ -140,10 +140,12 @@ function conversationMarkdown(entry, messages, { standalone = true, month = null
       out.push(`${standalone ? '###' : '####'} ${longDate(day)}`, '');
     }
     // Time to the second and the message id: the key a citation needs.
-    const tags = [`${msg.date} ${msg.time}`, `msg ${msg.id}`];
+    // Some quotes come from reporting that gives only the day.
+    const tags = [msg.time ? `${msg.date} ${msg.time}` : `${msg.date} (sem horário)`, `msg ${msg.id}`];
     if (msg.is_edited) tags.push('editada');
     if (msg.view_once) tags.push('visualização única');
     if (msg.source_page) tags.push(`laudo p. ${msg.source_page}${msg.source_figure ? `, fig. ${msg.source_figure}` : ''}`);
+    else if (msg.source_ref) tags.push(`fonte: ${msg.source_ref}`);
     out.push(`**${msg.sender}** · ${tags.join(' · ')}`);
     const body = messageBody(msg);
     if (body) out.push(...body.split('\n').map(escapeLine));
@@ -181,7 +183,7 @@ function conversationJson(entry, messages) {
     profile: profileJson(getContactProfile(entry.id), entry.id),
     messages: messages.map(m => ({
       ...m,
-      timestamp: /[+-]\d{2}:\d{2}$/.test(m.timestamp)
+      timestamp: !m.timestamp || /[+-]\d{2}:\d{2}$/.test(m.timestamp)
         ? m.timestamp
         : `${m.timestamp}${UTC_OFFSET}`,
     })),

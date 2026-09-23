@@ -31,9 +31,9 @@ describe('calls.json', () => {
   });
 
   it('reads the Portuguese of the report', () => {
-    const c = calls.find(x => x.conversation_id === 'fabio-faria' && x.message_id === 134);
+    const c = calls.find(x => x.conversation_id === 'fabio-faria' && x.message_id === 157);
     expect(c).toMatchObject({ kind: 'voice', status: 'completed', duration: '04:34', outgoing: false });
-    const missed = calls.find(x => x.conversation_id === 'fabio-faria' && x.message_id === 88);
+    const missed = calls.find(x => x.conversation_id === 'fabio-faria' && x.message_id === 111);
     expect(missed).toMatchObject({ kind: 'voice', status: 'missed', outgoing: false });
   });
 

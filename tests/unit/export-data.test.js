@@ -40,6 +40,8 @@ describe('the JSON', () => {
   it('stamps every timestamp with its UTC offset', () => {
     for (const conv of conversations) {
       for (const msg of json(conv.id).messages) {
+        // A quote dated only by the day, from reporting, has no timestamp.
+        if (!msg.time) { expect(msg.timestamp, `${conv.id} #${msg.id}`).toBeNull(); continue; }
         expect(msg.timestamp, `${conv.id} #${msg.id}`).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}-03:00$/);
       }
     }
@@ -60,6 +62,8 @@ describe('the JSON', () => {
     expect(fromReport.length).toBeGreaterThan(0);
     for (const conv of fromReport) {
       for (const msg of json(conv.id).messages) {
+        // Quotes a conversation takes from other reporting name that source instead.
+        if (msg.source_ref && !msg.source_ref.startsWith('IPJ-A')) continue;
         expect(msg.source_page, `${conv.id} #${msg.id}`).toBeGreaterThan(0);
       }
     }
@@ -113,7 +117,7 @@ describe('the Markdown', () => {
 
   it('keeps every message', () => {
     for (const conv of conversations) {
-      const headers = md(conv.id).split('\n').filter(l => /^\*\*.+\*\* · \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} · msg \d+/.test(l));
+      const headers = md(conv.id).split('\n').filter(l => /^\*\*.+\*\* · \d{4}-\d{2}-\d{2} (\d{2}:\d{2}:\d{2}|\(sem horário\)) · msg \d+/.test(l));
       expect(headers.length, conv.id).toBe(conv.total_messages);
     }
   });
